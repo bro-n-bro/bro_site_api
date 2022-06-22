@@ -74,13 +74,23 @@ NETWORKS = [
         "base_denom": "aevmos",
         "exponent": 1_000_000_000_000_000_000
     },
-    # {
-    #     "name": "crescent",
-    #     "lcd_api": "https://lcd.crescent-1.bronbro.io",
-    #     "validator": "bostromvaloper1ydc5fy9fjdygvgw36u49yj39fr67pd9m5qexm8",
-    #     "coingecko_api": "bostrom",
-    #     "prefix": "bostrom",
-    #     "base_denom": "boot"
-    # },
+    {
+        "name": "crescent",
+        "lcd_api": "https://lcd.crescent-1.bronbro.io",
+        "validator": "crevaloper1c96vvme4k42zlvkc56fslmdpa2qj6u80xvqwau",
+        "coingecko_api": "crescent-network",
+        "prefix": "cre",
+        "base_denom": "ucre",
+        "exponent": 1_000_000
+    },
+    {
+        "name": "omniflix",
+        "lcd_api": "https://lcd.omniflixhub-1.bronbro.io",
+        "validator": "omniflixvaloper1e8grpphncncw9hrutyvnlv77n5dejwcne58zk4",
+        "coingecko_api": "omniflix-network",
+        "prefix": "omniflix",
+        "base_denom": "uflix",
+        "exponent": 1_000_000
+    },
 ]
 
