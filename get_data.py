@@ -219,9 +219,10 @@ async def get_data():
         for network in networks:
             agents.extend(network[0][1])
             tokens_in_usd += network[0][0] * network[1]['price']
-            tokens_in_atom += tokens_in_usd / prices[0]
-            tokens_in_eth += tokens_in_usd / prices[1]
-            tokens_in_btc += tokens_in_usd / prices[2]
+            _tokens_in_usd = network[0][0] * network[1]['price']
+            tokens_in_atom += _tokens_in_usd / prices[0]
+            tokens_in_eth += _tokens_in_usd / prices[1]
+            tokens_in_btc += _tokens_in_usd / prices[2]
             infos.append(network[2])
         agents = len(list(dict.fromkeys(agents)))
         data = {
