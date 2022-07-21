@@ -131,7 +131,7 @@ async def get_annual_provisions(session, network):
         supply = await get_supply(session, network)
         return int(supply * 0.10)
     elif network['name'] == 'crescent':
-        url = "https://apigw.crescent.network/params"
+        url = "https://apigw-v2.crescent.network/params"
         async with session.get(url) as resp:
             resp = await resp.json()
             data = resp['data']
