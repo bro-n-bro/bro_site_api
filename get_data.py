@@ -131,7 +131,7 @@ async def get_annual_provisions(session, network):
         supply = await get_supply(session, network)
         return int(supply * 0.10)
     elif network['name'] == 'crescent':
-        url = "https://apigw.crescent.network/params"
+        url = "https://apigw-v2.crescent.network/params"
         async with session.get(url) as resp:
             resp = await resp.json()
             data = resp['data']
@@ -174,12 +174,12 @@ async def get_blocks_per_year(session, network):
 async def get_real_blocks_per_year(session, network):
     try:
         current_height, current_time = await get_block_info(session, network, 'latest')
-        height = current_height - 100_000
+        height = current_height - 1000
         old_height, old_time = await get_block_info(session, network, height)
         current_time_unix = int(parser.parse(current_time).timestamp())
         old_time_unix = int(parser.parse(old_time).timestamp())
         diff = current_time_unix - old_time_unix
-        real_block_time = diff / 100_000
+        real_block_time = diff / 1000
         return int(31_561_920 / real_block_time)
     except Exception:
         return 1.0
