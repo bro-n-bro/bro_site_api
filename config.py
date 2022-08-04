@@ -83,15 +83,15 @@ NETWORKS = [
         "base_denom": "uflix",
         "exponent": 1_000_000
     },
-    # {
-    #     "name": "cosmoshub",
-    #     "lcd_api": "https://lcd.cosmoshub-4.cybernode.ai",
-    #     "validator": "cosmosvaloper106yp7zw35wftheyyv9f9pe69t8rteumjrx52jg",
-    #     "coingecko_api": "cosmos",
-    #     "prefix": "cosmos",
-    #     "base_denom": "uatom",
-    #     "exponent": 1_000_000
-    # },
+    {
+        "name": "cosmoshub",
+        "lcd_api": "https://lcd.cosmoshub-4.bronbro.io",
+        "validator": "cosmosvaloper106yp7zw35wftheyyv9f9pe69t8rteumjrx52jg",
+        "coingecko_api": "cosmos",
+        "prefix": "cosmos",
+        "base_denom": "uatom",
+        "exponent": 1_000_000
+    },
     {
         "name": "desmos",
         "lcd_api": "https://lcd.desmos-mainnet.bronbro.io",

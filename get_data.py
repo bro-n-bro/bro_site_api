@@ -45,10 +45,10 @@ async def get_network_data(session, network):
 
 
 async def get_delegations(session, network):
-    url = f"{network['lcd_api']}/staking/validators/{network['validator']}/delegations?limit=1000000"
+    url = f"{network['lcd_api']}/cosmos/staking/v1beta1/validators/{network['validator']}/delegations?pagination.limit=100000"
     async with session.get(url) as resp:
         resp = await resp.json()
-        delegations = resp['result']
+        delegations = resp['delegation_responses']
         tokens = sum([int(d['balance']['amount']) for d in delegations]) / network['exponent']
         delegators = [address_to_address(d['delegation']['delegator_address'], 'prefix') for d in delegations]
         return tokens, delegators
