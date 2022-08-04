@@ -1,5 +1,6 @@
 from config import NETWORKS
 from dateutil import parser
+from operator import itemgetter
 
 
 import time
@@ -25,10 +26,14 @@ async def get_network_data(session, network):
     start = time.time()
     tasks = [asyncio.ensure_future(get_delegations(session, network)),
              asyncio.ensure_future(get_asset_price(session, network)),
-             asyncio.ensure_future(get_asset_apr(session, network))]
+             asyncio.ensure_future(get_asset_apr(session, network)),
+             asyncio.ensure_future(get_network_set(session, network))]
     data = await asyncio.gather(*tasks)
     stop = time.time()
     print(network['name'], stop - start)
+    halt_amount, fork_amount, vals = get_halt_fork(data[3])
+    place = get_network_place(data[3], network['validator'])
+    health = get_network_health(halt_amount, fork_amount, vals)
     if network['name'] == 'bostrom':
         denom = network['base_denom']
     else:
@@ -38,10 +43,66 @@ async def get_network_data(session, network):
         "apr": data[2][network['name']],
         "tokens": data[0][0],
         "delegators": len(data[0][1]),
-        "denom": denom
+        "denom": denom,
+        "health": health,
+        "place": place
     }
     data[2] = info
     return data
+
+
+def get_network_health(halt_amount: int, fork_amount: int, vals: int):
+    halt_share = halt_amount / vals
+    fork_share = fork_amount / vals
+    return (halt_share * fork_share) ** 0.5 * 100
+
+
+def get_halt_fork(validator_set: list):
+    validator_set = [
+        {
+            "operator_address": v['operator_address'],
+            "tokens": int(v['tokens'])
+        } for v in validator_set if not v['jailed'] and v['status'] == 'BOND_STATUS_BONDED']
+    validator_set = sorted(validator_set, key=itemgetter('tokens'), reverse=True)
+    tokens = sum([int(v['tokens']) for v in validator_set])
+    halt_amount = 0
+    fork_amount = 0
+    _tokens = 0
+    for _ in validator_set:
+        _tokens += _['tokens']
+        if _tokens / tokens < 0.333333333:
+            halt_amount += 1
+        elif _tokens / tokens < 0.66666666:
+            fork_amount += 1
+        else:
+            continue
+    halt_amount += 1
+    fork_amount += 1
+    return halt_amount, fork_amount, len(validator_set)
+
+
+def get_network_place(validator_set: list, validator: str):
+    validator_set = [
+        {
+            "operator_address": v['operator_address'],
+            "tokens": int(v['tokens'])
+        } for v in validator_set if not v['jailed'] and v['status'] == 'BOND_STATUS_BONDED']
+    validator_set = sorted(validator_set, key=itemgetter('tokens'), reverse=True)
+    try:
+        item = [v for v in validator_set if v['operator_address'] == validator][0]
+        index = validator_set.index(item)
+        return index + 1
+    except IndexError as e:
+        print(e)
+        return 0
+
+
+async def get_network_set(session, network):
+    url = f"{network['lcd_api']}/cosmos/staking/v1beta1/validators?pagination.limit=10000"
+    async with session.get(url) as resp:
+        resp = await resp.json()
+        validators_set = resp['validators']
+        return validators_set
 
 
 async def get_delegations(session, network):
@@ -205,7 +266,8 @@ async def get_block_info(session, network, height):
 async def get_data():
     networks_amount = get_networks(NETWORKS)
     prices = get_usd_prices()
-    async with aiohttp.ClientSession() as session:
+    connector = aiohttp.TCPConnector(limit=50)
+    async with aiohttp.ClientSession(connector=connector) as session:
         tasks = []
         for network in NETWORKS:
             tasks.append(asyncio.ensure_future(get_network_data(session, network)))
