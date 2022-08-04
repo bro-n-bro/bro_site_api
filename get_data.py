@@ -101,7 +101,7 @@ async def get_supply(session, network):
 
 
 async def get_annual_provisions(session, network):
-    if network['name'] in ['bostrom', 'juno', 'microtick', 'gravity']:
+    if network['name'] not in ['stargaze', 'osmosis', 'evmos', 'emoney', 'crescent']:
         try:
             url = f"{network['lcd_api']}/cosmos/mint/v1beta1/annual_provisions"
             async with session.get(url) as resp:

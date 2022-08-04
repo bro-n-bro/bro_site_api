@@ -38,15 +38,6 @@ NETWORKS = [
         "base_denom": "ungm",
         "exponent": 1_000_000
     },
-    # {
-    #     "name": "microtick",
-    #     "lcd_api": "https://lcd.microtick-1.bronbro.io",
-    #     "validator": "microvaloper13mkjrr578sxd7whex3mqru96vdt3tttw63uwtd",
-    #     "coingecko_api": "microtick",
-    #     "prefix": "micro",
-    #     "base_denom": "utick",
-    #     "exponent": 1_000_000
-    # },
     {
         "name": "stargaze",
         "lcd_api": "https://lcd.stargaze-1.bronbro.io",
@@ -94,7 +85,7 @@ NETWORKS = [
     },
     # {
     #     "name": "cosmoshub",
-    #     "lcd_api": "https://lcd.omniflixhub-1.bronbro.io",
+    #     "lcd_api": "https://lcd.cosmoshub-4.cybernode.ai",
     #     "validator": "cosmosvaloper106yp7zw35wftheyyv9f9pe69t8rteumjrx52jg",
     #     "coingecko_api": "cosmos",
     #     "prefix": "cosmos",
