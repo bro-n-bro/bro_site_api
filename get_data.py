@@ -32,7 +32,6 @@ async def get_network_data(session, network):
     stop = time.time()
     print(network['name'], stop - start)
     halt_amount, fork_amount, vals = get_halt_fork(data[3])
-    print(network['name'], halt_amount, fork_amount)
     place = get_network_place(data[3], network['validator'])
     health = get_network_health(halt_amount, fork_amount, vals)
     if network['name'] == 'bostrom':
@@ -53,9 +52,9 @@ async def get_network_data(session, network):
 
 
 def get_network_health(halt_amount: int, fork_amount: int, vals: int):
-    halt_share = halt_amount / vals
-    fork_share = fork_amount / vals
-    return (halt_share * fork_share) ** 0.5
+    # halt_share = halt_amount / vals
+    # fork_share = fork_amount / vals
+    return (halt_amount * fork_amount) ** 0.5
 
 
 def get_halt_fork(validator_set: list):
