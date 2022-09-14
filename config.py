@@ -57,15 +57,6 @@ NETWORKS = [
         "exponent": 1_000_000
     },
     {
-        "name": "evmos",
-        "lcd_api": "https://lcd.evmos-9001-2.bronbro.io",
-        "validator": "evmosvaloper1ce4vh0e5kanlgc7z0rhcemvd8erjnfzcyfecl7",
-        "coingecko_api": "evmos",
-        "prefix": "evm",
-        "base_denom": "aevmos",
-        "exponent": 1_000_000_000_000_000_000
-    },
-    {
         "name": "crescent",
         "lcd_api": "https://lcd.crescent-1.bronbro.io",
         "validator": "crevaloper1c96vvme4k42zlvkc56fslmdpa2qj6u80xvqwau",
@@ -99,6 +90,24 @@ NETWORKS = [
         "coingecko_api": "desmos",
         "prefix": "desmos",
         "base_denom": "udsm",
+        "exponent": 1_000_000
+    },
+    {
+        "name": "evmos",
+        "lcd_api": "https://lcd.evmos-9001-2.bronbro.io",
+        "validator": "evmosvaloper1ce4vh0e5kanlgc7z0rhcemvd8erjnfzcyfecl7",
+        "coingecko_api": "evmos",
+        "prefix": "evmos",
+        "base_denom": "aevmos",
+        "exponent": 1_000_000_000_000_000_000
+    },
+    {
+        "name": "stride",
+        "lcd_api": "https://lcd.stride-1.bronbro.io",
+        "validator": "stridevaloper1hl95uhecs4rwe0g432mknz2tsl84f0ltexpzc3",
+        "coingecko_api": "stride",
+        "prefix": "stride",
+        "base_denom": "ustrd",
         "exponent": 1_000_000
     },
 ]

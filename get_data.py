@@ -52,8 +52,6 @@ async def get_network_data(session, network):
 
 
 def get_network_health(halt_amount: int, fork_amount: int, vals: int):
-    # halt_share = halt_amount / vals
-    # fork_share = fork_amount / vals
     return (halt_amount * fork_amount) ** 0.5
 
 
@@ -162,7 +160,7 @@ async def get_supply(session, network):
 
 
 async def get_annual_provisions(session, network):
-    if network['name'] not in ['stargaze', 'osmosis', 'evmos', 'emoney', 'crescent']:
+    if network['name'] not in ['stargaze', 'osmosis', 'evmos', 'emoney', 'crescent', 'stride']:
         try:
             url = f"{network['lcd_api']}/cosmos/mint/v1beta1/annual_provisions"
             async with session.get(url) as resp:
@@ -198,6 +196,13 @@ async def get_annual_provisions(session, network):
             data = resp['data']
             annual_provisions_raw = [x for x in data if x['key'] == 'liquidstaking.total_reward_ucre_amount_per_year'][0]
             return int(annual_provisions_raw['value'])
+    elif network['name'] == 'stride':
+        url = f"{network['lcd_api']}/mint/v1beta1/params"
+        async with session.get(url) as resp:
+            resp = await resp.json()
+            return float(resp['params']['genesis_epoch_provisions']) * \
+                   float(resp['params']['reduction_period_in_epochs']) * \
+                   float(resp['params']['distribution_proportions']['staking'])
     else:
         return 0
 
@@ -266,7 +271,7 @@ async def get_block_info(session, network, height):
 async def get_data():
     networks_amount = get_networks(NETWORKS)
     prices = get_usd_prices()
-    connector = aiohttp.TCPConnector(limit=50)
+    connector = aiohttp.TCPConnector(limit=100)
     async with aiohttp.ClientSession(connector=connector) as session:
         tasks = []
         for network in NETWORKS:
