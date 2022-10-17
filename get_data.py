@@ -175,7 +175,7 @@ async def get_annual_provisions(session, network):
         url = f"{network['lcd_api']}/minting/annual-provisions"
         async with session.get(url) as resp:
             resp = await resp.json()
-            return int(float(resp['result']) * 0.50)
+            return int(float(resp['result']) * 0.35)
     elif network['name'] == 'osmosis':
         url = f"{network['lcd_api']}/osmosis/mint/v1beta1/epoch_provisions"
         async with session.get(url) as resp:
