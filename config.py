@@ -1,6 +1,8 @@
 API_PORT = 5002
 API_HOST = "0.0.0.0"
 
+SQL_PATH = './networks.db'
+
 NETWORKS = [
     {
         "name": "bostrom",
