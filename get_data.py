@@ -91,7 +91,7 @@ def get_network_place(validator_set: list, validator: str):
 
 async def get_network_set(session, network):
     url = f"{network['lcd_api']}/cosmos/staking/v1beta1/validators?pagination.limit=10000"
-    async with session.get(url) as resp:
+    async with session.get(url, timeout=360) as resp:
         resp = await resp.json()
         validators_set = resp['validators']
         return validators_set
@@ -99,7 +99,7 @@ async def get_network_set(session, network):
 
 async def get_delegations(session, network):
     url = f"{network['lcd_api']}/cosmos/staking/v1beta1/validators/{network['validator']}/delegations?pagination.limit=100000"
-    async with session.get(url) as resp:
+    async with session.get(url, timeout=360) as resp:
         resp = await resp.json()
         delegations = resp['delegation_responses']
         tokens = sum([int(d['balance']['amount']) for d in delegations]) / network['exponent']
@@ -111,7 +111,7 @@ async def get_delegations(session, network):
 
 async def get_asset_price(session, network):
     url = f"https://api.coingecko.com/api/v3/simple/price?ids={network['coingecko_api']}&vs_currencies=usd"
-    async with session.get(url) as resp:
+    async with session.get(url, timeout=360) as resp:
         try:
             resp = await resp.json()
             set_value_by_network(network['name'], 'price', float(resp[network['coingecko_api']]['usd']))
@@ -139,21 +139,21 @@ async def get_asset_apr(session, network):
 
 async def get_inflation(session, network):
     url = f"{network['lcd_api']}/cosmos/mint/v1beta1/inflation"
-    async with session.get(url) as resp:
+    async with session.get(url, timeout=360) as resp:
         resp = await resp.json()
         return float(resp['inflation'])
 
 
 async def get_bonded_tokens(session, network):
     url = f"{network['lcd_api']}/cosmos/staking/v1beta1/pool"
-    async with session.get(url) as resp:
+    async with session.get(url, timeout=360) as resp:
         resp = await resp.json()
         return int(resp['pool']['bonded_tokens'])
 
 
 async def get_supply(session, network):
     url = f"{network['lcd_api']}/cosmos/bank/v1beta1/supply/{network['base_denom']}"
-    async with session.get(url) as resp:
+    async with session.get(url, timeout=360) as resp:
         resp = await resp.json()
         return int(resp['amount']['amount'])
 
@@ -162,27 +162,27 @@ async def get_annual_provisions(session, network):
     if network['name'] not in ['stargaze', 'osmosis', 'evmos', 'emoney', 'crescent', 'stride']:
         try:
             url = f"{network['lcd_api']}/cosmos/mint/v1beta1/annual_provisions"
-            async with session.get(url) as resp:
+            async with session.get(url, timeout=360) as resp:
                 resp = await resp.json()
                 return int(float(resp['annual_provisions']))
         except Exception:
             url = f"{network['lcd_api']}/minting/annual-provisions"
-            async with session.get(url) as resp:
+            async with session.get(url, timeout=360) as resp:
                 resp = await resp.json()
                 return int(float(resp['result']))
     elif network['name'] == 'stargaze':
         url = f"{network['lcd_api']}/minting/annual-provisions"
-        async with session.get(url) as resp:
+        async with session.get(url, timeout=360) as resp:
             resp = await resp.json()
             return int(float(resp['result']) * 0.4)
     elif network['name'] == 'osmosis':
         url = f"{network['lcd_api']}/osmosis/mint/v1beta1/epoch_provisions"
-        async with session.get(url) as resp:
+        async with session.get(url, timeout=360) as resp:
             resp = await resp.json()
             return int(float(resp['epoch_provisions']) * 365.3 * 0.25)
     elif network['name'] == 'evmos':
         url = f"{network['lcd_api']}/evmos/inflation/v1/epoch_mint_provision"
-        async with session.get(url) as resp:
+        async with session.get(url, timeout=360) as resp:
             resp = await resp.json()
             return int(float(resp['epoch_mint_provision']['amount']) * 365.3 * 0.533333334)
     elif network['name'] == 'emoney':
@@ -190,14 +190,14 @@ async def get_annual_provisions(session, network):
         return int(supply * 0.10)
     elif network['name'] == 'crescent':
         url = "https://apigw-v2.crescent.network/params"
-        async with session.get(url) as resp:
+        async with session.get(url, timeout=360) as resp:
             resp = await resp.json()
             data = resp['data']
             annual_provisions_raw = [x for x in data if x['key'] == 'liquidstaking.total_reward_ucre_amount_per_year'][0]
             return int(annual_provisions_raw['value'])
     elif network['name'] == 'stride':
         url = f"{network['lcd_api']}/mint/v1beta1/params"
-        async with session.get(url) as resp:
+        async with session.get(url, timeout=360) as resp:
             resp = await resp.json()
             return float(resp['params']['genesis_epoch_provisions']) * \
                    float(resp['params']['reduction_period_in_epochs']) * \
@@ -212,7 +212,7 @@ async def get_community_tax(session, network):
         return 0.0
     else:
         try:
-            async with session.get(url) as resp:
+            async with session.get(url, timeout=360) as resp:
                 resp = await resp.json()
                 return float(resp['params']['community_tax'])
         except Exception as e:
@@ -223,13 +223,13 @@ async def get_community_tax(session, network):
 async def get_blocks_per_year(session, network):
     try:
         url = f"{network['lcd_api']}/cosmos/mint/v1beta1/params"
-        async with session.get(url) as resp:
+        async with session.get(url, timeout=360) as resp:
             resp = await resp.json()
             try:
                 return int(resp['params']['blocks_per_year'])
             except Exception as e:
                 url = f"{network['lcd_api']}/minting/parameters"
-                async with session.get(url) as resp:
+                async with session.get(url, timeout=360) as resp:
                     resp = await resp.json()
                     return int(resp['result']['blocks_per_year'])
     except Exception:
@@ -253,14 +253,14 @@ async def get_real_blocks_per_year(session, network):
 async def get_block_info(session, network, height):
     try:
         url = f"{network['lcd_api']}/cosmos/base/tendermint/v1beta1/blocks/{height}"
-        async with session.get(url) as resp:
+        async with session.get(url, timeout=360) as resp:
             resp = await resp.json()
             height = int(resp['block']['header']['height'])
             timestamp = resp['block']['header']['time']
             return height, timestamp
     except Exception:
         url = f"{network['lcd_api']}/blocks/{height}"
-        async with session.get(url) as resp:
+        async with session.get(url, timeout=360) as resp:
             resp = await resp.json()
             height = int(resp['block']['header']['height'])
             timestamp = resp['block']['header']['time']

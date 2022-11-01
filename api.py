@@ -36,5 +36,18 @@ def bro_data():
     })
 
 
+@app.route('/get_prices', methods=['GET'])
+def prices():
+    data = get_prices()
+    print(data)
+    res = {
+        data[0][0]: data[0][1],
+        data[1][0]: data[1][1],
+        data[2][0]: data[2][1]
+    }
+    print(res)
+    return jsonify(res)
+
+
 if __name__ == '__main__':
     app.run(host=API_HOST, port=API_PORT)
