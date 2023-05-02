@@ -11,7 +11,7 @@ from db import set_value_by_network, set_value_by_api, create_table
 
 
 async def get_usd_prices():
-    connector = aiohttp.TCPConnector(limit=100)
+    connector = aiohttp.TCPConnector(limit=50, force_close=True)
     async with aiohttp.ClientSession(connector=connector) as session:
         tasks = [
             asyncio.ensure_future((get_asset_price(session, {"name": "cosmos", "coingecko_api": "cosmos"}))),
@@ -159,7 +159,7 @@ async def get_supply(session, network):
 
 
 async def get_annual_provisions(session, network):
-    if network['name'] not in ['stargaze', 'osmosis', 'evmos', 'emoney', 'crescent', 'stride']:
+    if network['name'] not in ['stargaze', 'osmosis', 'evmos', 'emoney', 'crescent', 'stride', 'omniflix']:
         try:
             url = f"{network['lcd_api']}/cosmos/mint/v1beta1/annual_provisions"
             async with session.get(url, timeout=360) as resp:
@@ -170,6 +170,11 @@ async def get_annual_provisions(session, network):
             async with session.get(url, timeout=360) as resp:
                 resp = await resp.json()
                 return int(float(resp['result']))
+    elif network['name'] == 'omniflix':
+        url = f"{network['lcd_api']}/minting/annual-provisions"
+        async with session.get(url, timeout=360) as resp:
+            resp = await resp.json()
+            return int(float(resp['result']) * 0.6)
     elif network['name'] == 'stargaze':
         url = f"{network['lcd_api']}/minting/annual-provisions"
         async with session.get(url, timeout=360) as resp:
