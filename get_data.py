@@ -14,9 +14,9 @@ async def get_usd_prices():
     connector = aiohttp.TCPConnector(limit=50, force_close=True)
     async with aiohttp.ClientSession(connector=connector) as session:
         tasks = [
-            asyncio.ensure_future((get_asset_price(session, {"name": "cosmos", "coingecko_api": "cosmos"}))),
-            asyncio.ensure_future((get_asset_price(session, {"name": "ethereum", "coingecko_api": "ethereum"}))),
-            asyncio.ensure_future((get_asset_price(session, {"name": "bitcoin", "coingecko_api": "bitcoin"}))),
+            asyncio.ensure_future((get_asset_price(session, {"name": "cosmos", "display": "atom"}))),
+            asyncio.ensure_future((get_asset_price(session, {"name": "ethereum", "display": "axlweth"}))),
+            asyncio.ensure_future((get_asset_price(session, {"name": "bitcoin", "display": "axlwbtc"}))),
         ]
         prices = await asyncio.gather(*tasks)
         set_value_by_api('cosmos', 'price', prices[0]['price'])
@@ -85,7 +85,7 @@ def get_network_place(validator_set: list, validator: str):
         index = validator_set.index(item)
         return index + 1
     except IndexError as e:
-        print(e)
+        print('get_network_place', e)
         return 0
 
 
@@ -110,14 +110,15 @@ async def get_delegations(session, network):
 
 
 async def get_asset_price(session, network):
-    url = f"https://api.coingecko.com/api/v3/simple/price?ids={network['coingecko_api']}&vs_currencies=usd"
+    url = f"https://rpc.bronbro.io/price_feed_api/tokens/"
     async with session.get(url, timeout=360) as resp:
         try:
             resp = await resp.json()
-            set_value_by_network(network['name'], 'price', float(resp[network['coingecko_api']]['usd']))
-            return {"price": float(resp[network['coingecko_api']]['usd'])}
+            price = [x for x in resp if x['display'] == network['display']][0]['price']
+            set_value_by_network(network['name'], 'price', price)
+            return {"price": price}
         except Exception as e:
-            print(e)
+            print(network['name'], e)
             pass
 
 
@@ -190,11 +191,8 @@ async def get_annual_provisions(session, network):
         async with session.get(url, timeout=360) as resp:
             resp = await resp.json()
             return int(float(resp['epoch_mint_provision']['amount']) * 365.3 * 0.533333334)
-    elif network['name'] == 'emoney':
-        supply = await get_supply(session, network)
-        return int(supply * 0.10)
     elif network['name'] == 'crescent':
-        url = "https://apigw-v2.crescent.network/params"
+        url = "https://apigw-v3.crescent.network/params"
         async with session.get(url, timeout=360) as resp:
             resp = await resp.json()
             data = resp['data']
