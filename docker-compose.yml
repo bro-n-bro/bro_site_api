@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    depends_on:
+      - db
+    volumes:
+      - ./:/code:ro
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/networks_db
+    ports:
+      - "8000:8000"
+
+  db:
+      image: postgres:15-alpine
+      volumes:
+        - postgres_data:/var/lib/postgresql/data/
+      expose:
+        - 5432
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_DB=networks_db
+
+volumes:
+      postgres_data:

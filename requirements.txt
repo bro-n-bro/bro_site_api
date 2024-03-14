@@ -1,4 +1,8 @@
-Flask>=2.1.1
-aiohttp>=3.8.1
-requests>=2.27.1
-cyberpy>=0.0.8
+fastapi
+cosmpy
+uvicorn[standard]
+fastapi-utils
+requests
+sqlalchemy
+sqlalchemy_utils
+psycopg2-binary
