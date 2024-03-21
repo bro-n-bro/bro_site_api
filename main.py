@@ -5,9 +5,9 @@ from fastapi import FastAPI, Depends
 from fastapi_utils.tasks import repeat_every
 from sqlalchemy.orm import Session
 
-from sql_app.crud import get_networks
+from sql_app.crud import get_networks, get_info
 from sql_app.database import engine, Base, sessionmaker_for_periodic_task, get_db
-from sql_app.schemas import Network
+from sql_app.schemas import Network, FullInfo
 from sql_app.sync import sync_networks
 
 
@@ -24,9 +24,9 @@ def start_application():
 app = start_application()
 
 
-@app.get("/networks/", response_model=List[Network])
+@app.get("/networks/", response_model=FullInfo)
 def read_networks(db: Session = Depends(get_db)):
-    return get_networks(db)
+    return get_info(db)
 
 
 @app.on_event("startup")
