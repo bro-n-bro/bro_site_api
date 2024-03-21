@@ -8,6 +8,7 @@ WORKDIR /code
 COPY requirements.txt ./
 
 #
+RUN pip install pydantic==2.6.4
 RUN pip install --no-cache-dir -r requirements.txt
 
 #
