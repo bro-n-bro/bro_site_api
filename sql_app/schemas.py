@@ -1,8 +1,9 @@
 from datetime import datetime
-from typing import List
+from typing import List, Any
 
 import requests
-from pydantic import BaseModel, computed_field, ConfigDict, Extra
+from pydantic import BaseModel, ConfigDict, Extra, validator, Field
+from pydantic_computed import Computed, computed
 
 
 class NetworkBase(BaseModel):
@@ -30,56 +31,56 @@ class Network(NetworkBase):
 
 class FullInfo(BaseModel):
     infos: List[Network]
+    networks_validated: Computed[int]
+    delegators: Computed[int]
+    tokens_in_atom: Computed[int]
+    tokens_in_eth: Computed[int]
+    tokens_in_btc: Computed[int]
+    tokens_in_usd: Computed[int]
 
-    @property
-    def prices(self) -> List[dict]:
-        return requests.get('https://rpc.bronbro.io/price_feed_api/tokens/').json()
+    @computed('networks_validated')
+    def calculate_networks_validated(infos: List[Network], **kwargs) -> int:
+        return len(infos)
 
-    @computed_field
-    @property
-    def networks_validated(self) -> int:
-        return len(self.infos)
+    @computed('delegators')
+    def calculate_delegators(infos: List[Network], **kwargs) -> int:
+        return sum(item.delegators for item in infos)
 
-    @computed_field
-    @property
-    def delegators(self) -> int:
-        return sum(item.delegators for item in self.infos)
-
-    @computed_field
-    @property
-    def tokens_in_atom(self) -> int:
+    @computed('tokens_in_atom')
+    def calculate_tokens_in_atom(infos: List[Network], **kwargs) -> int:
+        prices = requests.get('https://rpc.bronbro.io/price_feed_api/tokens/').json()
         result = 0
-        atom_price = next((item['price'] for item in self.prices if item['symbol'] == 'ATOM'), None)
-        for network in self.infos:
+        atom_price = next((item['price'] for item in prices if item['symbol'] == 'ATOM'), None)
+        for network in infos:
             if network.price and atom_price:
                 result += network.tokens * network.price / atom_price
         return result
 
-    @computed_field
-    @property
-    def tokens_in_eth(self) -> int:
+    @computed('tokens_in_eth')
+    def calculate_tokens_in_eth(infos: List[Network], **kwargs) -> int:
+        prices = requests.get('https://rpc.bronbro.io/price_feed_api/tokens/').json()
         result = 0
-        atom_price = next((item['price'] for item in self.prices if item['symbol'] == 'WETH.grv'), None)
-        for network in self.infos:
+        atom_price = next((item['price'] for item in prices if item['symbol'] == 'WETH.grv'), None)
+        for network in infos:
             if network.price and atom_price:
                 result += network.tokens * network.price / atom_price
         return result
 
-    @computed_field
-    @property
-    def tokens_in_btc(self) -> int:
+    @computed('tokens_in_btc')
+    def calculate_tokens_in_btc(infos: List[Network], **kwargs) -> int:
+        prices = requests.get('https://rpc.bronbro.io/price_feed_api/tokens/').json()
         result = 0
-        atom_price = next((item['price'] for item in self.prices if item['symbol'] == 'WBTC.axl'), None)
-        for network in self.infos:
+        atom_price = next((item['price'] for item in prices if item['symbol'] == 'WBTC.axl'), None)
+        for network in infos:
             if network.price and atom_price:
                 result += network.tokens * network.price / atom_price
         return result
 
-    @computed_field
-    @property
-    def tokens_in_usd(self) -> int:
+
+    @computed('tokens_in_usd')
+    def calculate_tokens_in_usd(infos: List[Network], **kwargs) -> int:
         result = 0
-        for network in self.infos:
+        for network in infos:
             if network.price:
                 result += network.tokens * network.price
         return result
