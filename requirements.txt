@@ -6,3 +6,4 @@ requests
 sqlalchemy
 sqlalchemy_utils
 psycopg2-binary
+pydantic_computed
