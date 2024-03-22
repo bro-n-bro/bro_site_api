@@ -10,7 +10,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/networks_db
     ports:
-      - "8000:8000"
+      - "5002:5002"
 
   db:
       image: postgres:15-alpine
