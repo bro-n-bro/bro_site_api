@@ -57,7 +57,7 @@ def get_apr(network, ledger_client):
     #     annual_provisions = float(requests.get(f"{network['lcd_api']}/cosmos/mint/v1beta1/annual_provisions").json()['annual_provisions'])
     if network['name'] == 'empower':
         community_tax = 0.25
-    elif network['name'] in ['composable', 'qwyon']:
+    elif network['name'] in ['composable', 'qwoyn']:
         community_tax = 0.02
     else:
         req = QueryParamsRequest(subspace="distribution", key="communitytax")
