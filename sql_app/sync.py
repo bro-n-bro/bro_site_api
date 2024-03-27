@@ -26,9 +26,9 @@ def get_annual_provisions(network):
             resp = requests.get(url).json()
             return int(float(resp['result']))
     elif network['name'] == 'stargaze':
-        url = f"{network['lcd_api']}/minting/annual-provisions"
+        url = f"{network['lcd_api']}/stargaze/mint/v1beta1/annual_provisions"
         resp = requests.get(url).json()
-        return int(float(resp['result']) * 0.4)
+        return int(float(resp['annual_provisions']) * 0.4)
     elif network['name'] == 'osmosis':
         url = f"{network['lcd_api']}/osmosis/mint/v1beta1/epoch_provisions"
         resp = requests.get(url).json()
