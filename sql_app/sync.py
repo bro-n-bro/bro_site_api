@@ -20,6 +20,8 @@ def get_annual_provisions(network):
         try:
             url = f"{network['lcd_api']}/cosmos/mint/v1beta1/annual_provisions"
             resp = requests.get(url).json()
+            if network['name'] in ['omniflix', 'qwoyn']:
+                return int(float(resp['annual_provisions'])*0.6)
             return int(float(resp['annual_provisions']))
         except Exception:
             url = f"{network['lcd_api']}/minting/annual-provisions"
@@ -28,33 +30,29 @@ def get_annual_provisions(network):
     elif network['name'] == 'stargaze':
         url = f"{network['lcd_api']}/stargaze/mint/v1beta1/annual_provisions"
         resp = requests.get(url).json()
-        return int(float(resp['annual_provisions']) * 0.4)
+        return int(float(resp['annual_provisions'])*0.85)
     elif network['name'] == 'osmosis':
         url = f"{network['lcd_api']}/osmosis/mint/v1beta1/epoch_provisions"
         resp = requests.get(url).json()
-        return int(float(resp['epoch_provisions']) * 365.3 * 0.25)
+        return int(float(resp['epoch_provisions']) * 365.3 * 0.5)
     elif network['name'] == 'evmos':
         url = f"{network['lcd_api']}/evmos/inflation/v1/epoch_mint_provision"
         resp = requests.get(url).json()
         return int(float(resp['epoch_mint_provision']['amount']) * 365.3 * 0.533333334)
     elif network['name'] == 'stride':
+        # Hardcode *1.5 as something calculates invalid
         url = f"{network['lcd_api']}/mint/v1beta1/params"
         resp = requests.get(url).json()
         return float(resp['params']['genesis_epoch_provisions']) * \
                float(resp['params']['reduction_period_in_epochs']) * \
-               float(resp['params']['distribution_proportions']['staking'])
+               float(resp['params']['distribution_proportions']['staking']) * 1.5
     else:
         return 0
 
 
 def get_apr(network, ledger_client):
-    n = 500
     bonded_tokens_amount = int(ledger_client.staking.Pool(QueryPoolRequest()).pool.bonded_tokens)
     annual_provisions = get_annual_provisions(network)
-    # if network['name'] == 'evmos':
-    #     annual_provisions = float(requests.get(f"{network['lcd_api']}/evmos/inflation/v1/epoch_mint_provision").json()['epoch_mint_provision']['amount'])
-    # else:
-    #     annual_provisions = float(requests.get(f"{network['lcd_api']}/cosmos/mint/v1beta1/annual_provisions").json()['annual_provisions'])
     if network['name'] == 'empower':
         community_tax = 0.25
     elif network['name'] in ['composable', 'qwoyn']:
@@ -63,18 +61,20 @@ def get_apr(network, ledger_client):
         req = QueryParamsRequest(subspace="distribution", key="communitytax")
         resp = ledger_client.params.Params(req)
         community_tax = float(json.loads(resp.param.value))
-    # community_tax = float(json.loads(ledger_client.params.Params(QueryParamsRequest(subspace="distribution", key="communitytax")).param.value))
-    current_height = ledger_client.query_height()
-    current_height_time = ledger_client.query_block(current_height).time
-    past_height_time = ledger_client.query_block(current_height - n).time
-    diff = current_height_time - past_height_time
-    try:
-        real_block_time = diff.seconds / n
-        real_blocks_per_year = 31561920 / real_block_time
-        block_per_year = int(ledger_client.query_params(subspace='mint', key='BlocksPerYear'))
-        correction_annual_coefficient = real_blocks_per_year / block_per_year
-    except Exception as e:
-        correction_annual_coefficient = 1
+    # Remove currently correction_annual_coefficient calculation as we don't have enough blocks
+    # n = 500
+    # current_height = ledger_client.query_height()
+    # current_height_time = ledger_client.query_block(current_height).time
+    # past_height_time = ledger_client.query_block(current_height - n).time
+    # diff = current_height_time - past_height_time
+    # try:
+    #     real_block_time = diff.seconds / n
+    #     real_blocks_per_year = 31561920 / real_block_time
+    #     block_per_year = int(ledger_client.query_params(subspace='mint', key='BlocksPerYear'))
+    #     correction_annual_coefficient = real_blocks_per_year / block_per_year
+    # except Exception as e:
+    #     correction_annual_coefficient = 1
+    correction_annual_coefficient = 1
     return (annual_provisions * (1 - community_tax) / bonded_tokens_amount) * correction_annual_coefficient
 
 
