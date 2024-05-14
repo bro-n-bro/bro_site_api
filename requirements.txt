@@ -1,9 +1,9 @@
-fastapi
-cosmpy
+fastapi==0.110.0
+cosmpy==0.9.2
 uvicorn[standard]
-fastapi-utils
+fastapi-utils==0.2.1
 requests
-sqlalchemy
-sqlalchemy_utils
+sqlalchemy==1.4.52
+sqlalchemy_utils==0.41.1
 psycopg2-binary
 pydantic_computed
