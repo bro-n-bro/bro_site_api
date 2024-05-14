@@ -57,6 +57,8 @@ def get_apr(network, ledger_client):
         community_tax = 0.25
     elif network['name'] in ['composable', 'qwoyn']:
         community_tax = 0.02
+    elif network['name'] == 'seda':
+        community_tax = float(requests.get(f"{network['lcd_api']}/cosmos/distribution/v1beta1/params").json()['params']['community_tax'])
     else:
         req = QueryParamsRequest(subspace="distribution", key="communitytax")
         resp = ledger_client.params.Params(req)
