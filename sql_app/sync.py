@@ -120,7 +120,7 @@ def sync_networks(db: Session):
                                     validator.operator_address == network['validator_addr']), (-1, None))
             rank += 1
             tokens = int(validator.tokens) / 10 ** network['exponent']
-            price = next((price['price'] for price in prices if price['symbol'] == network['symbol']), 0)
+            price = next((price['price'] for price in prices if price['symbol'].lower() == network['symbol'].lower()), 0)
             apr = get_apr(network, ledger_client)
 
             network = {
