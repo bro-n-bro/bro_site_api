@@ -50,7 +50,7 @@ class FullInfo(BaseModel):
     def calculate_tokens_in_atom(infos: List[Network], **kwargs) -> int:
         prices = requests.get('https://rpc.bronbro.io/price_feed_api/tokens/').json()
         result = 0
-        atom_price = next((item['price'] for item in prices if item['symbol'] == 'ATOM'), None)
+        atom_price = next((item['price'] for item in prices if item['symbol'] == 'atom'), None)
         for network in infos:
             if network.price and atom_price:
                 result += network.tokens * network.price / atom_price
@@ -60,7 +60,7 @@ class FullInfo(BaseModel):
     def calculate_tokens_in_eth(infos: List[Network], **kwargs) -> int:
         prices = requests.get('https://rpc.bronbro.io/price_feed_api/tokens/').json()
         result = 0
-        atom_price = next((item['price'] for item in prices if item['symbol'] == 'WETH.grv'), None)
+        atom_price = next((item['price'] for item in prices if item['symbol'] == 'axleth'), None)
         for network in infos:
             if network.price and atom_price:
                 result += network.tokens * network.price / atom_price
@@ -70,7 +70,7 @@ class FullInfo(BaseModel):
     def calculate_tokens_in_btc(infos: List[Network], **kwargs) -> int:
         prices = requests.get('https://rpc.bronbro.io/price_feed_api/tokens/').json()
         result = 0
-        atom_price = next((item['price'] for item in prices if item['symbol'] == 'WBTC.axl'), None)
+        atom_price = next((item['price'] for item in prices if item['symbol'] == 'axlwbtc'), None)
         for network in infos:
             if network.price and atom_price:
                 result += network.tokens * network.price / atom_price
