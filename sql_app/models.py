@@ -24,6 +24,6 @@ class Network(Base):
     tokens = Column(BigInteger)
     __table_args__ = (
         CheckConstraint(delegators >= 0, name='check_delegators_positive'),
-        CheckConstraint(place >= 1, name='check_place_positive'),
+        CheckConstraint(place >= 0, name='check_place_positive'),
         {}
     )
