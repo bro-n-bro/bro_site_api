@@ -16,7 +16,7 @@ from cosmpy.protos.cosmos.params.v1beta1.query_pb2 import QueryParamsRequest
 
 
 def get_annual_provisions(network):
-    if network['name'] not in ['stargaze', 'osmosis', 'evmos', 'emoney', 'crescent', 'stride']:
+    if network['name'] not in ['stargaze', 'osmosis', 'evmos', 'emoney', 'crescent', 'stride', 'elys']:
         try:
             url = f"{network['lcd_api']}/cosmos/mint/v1beta1/annual_provisions"
             resp = requests.get(url).json()
@@ -57,7 +57,7 @@ def get_apr(network, ledger_client):
         community_tax = 0.25
     elif network['name'] in ['composable', 'qwoyn']:
         community_tax = 0.02
-    elif network['name'] == 'seda':
+    elif network['name'] in ['seda', 'side', 'elys', 'saga']:
         community_tax = float(requests.get(f"{network['lcd_api']}/cosmos/distribution/v1beta1/params").json()['params']['community_tax'])
     else:
         req = QueryParamsRequest(subspace="distribution", key="communitytax")
@@ -119,7 +119,7 @@ def sync_networks(db: Session):
             rank, validator = next(((i, validator) for i, validator in enumerate(validators) if
                                     validator.operator_address == network['validator_addr']), (-1, None))
             rank += 1
-            tokens = int(validator.tokens) / 10 ** network['exponent']
+            tokens = int(validator.tokens) / 10 ** network['exponent'] if validator else 0
             price = next((price['price'] for price in prices if price['symbol'].lower() == network['symbol'].lower()), 0)
             apr = get_apr(network, ledger_client)
 
